@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="grid.cu" />
+    <CudaCompile Include="main.cu" />
+    <CudaCompile Include="mpm_solver.cu" />
+    <CudaCompile Include="particle.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="glad.cpp" />
+    <ClCompile Include="parser.cpp" />
+    <ClCompile Include="point_loader.cpp" />
+    <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="texture.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="plane.frag" />
+    <None Include="plane.vert" />
+    <None Include="snow.frag" />
+    <None Include="snow.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\constant.h" />
+    <ClInclude Include="..\include\grid.h" />
+    <ClInclude Include="..\include\linalg.h" />
+    <ClInclude Include="..\include\mpm_solver.h" />
+    <ClInclude Include="..\include\parser.h" />
+    <ClInclude Include="..\include\particle.h" />
+    <ClInclude Include="..\include\point_loader.h" />
+    <ClInclude Include="..\include\renderer.h" />
+    <ClInclude Include="..\include\shader.h" />
+    <ClInclude Include="..\include\stb_image.h" />
+    <ClInclude Include="..\include\texture.h" />
+    <ClInclude Include="..\include\lyra\lyra.hpp" />
+  </ItemGroup>
+</Project>
