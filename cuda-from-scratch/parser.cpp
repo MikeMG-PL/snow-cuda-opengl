@@ -78,7 +78,12 @@ namespace parser {
                 ("model,m", po::value<std::string>()->required(), "model file")
                 ;
 
-            std::ifstream fs(vm["config"].as<std::string>());
+            std::ifstream fs;
+            fs.open(vm["config"].as<std::string>(), std::ifstream::in);
+            if (!fs.is_open()) {
+                std::cerr << "Error: Could not open configuration file " << vm["config"].as<std::string>() << std::endl;
+                exit(1);
+            }
             po::store(po::parse_config_file(fs, config), vm);
             po::notify(vm);
 

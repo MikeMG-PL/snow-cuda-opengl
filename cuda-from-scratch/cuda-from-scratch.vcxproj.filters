@@ -13,6 +13,13 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="..\include\imgui.cpp" />
+    <ClCompile Include="..\include\imgui_demo.cpp" />
+    <ClCompile Include="..\include\imgui_draw.cpp" />
+    <ClCompile Include="..\include\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\include\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\include\imgui_tables.cpp" />
+    <ClCompile Include="..\include\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="plane.frag" />
@@ -33,5 +40,14 @@
     <ClInclude Include="..\include\stb_image.h" />
     <ClInclude Include="..\include\texture.h" />
     <ClInclude Include="..\include\lyra\lyra.hpp" />
+    <ClInclude Include="..\include\imconfig.h" />
+    <ClInclude Include="..\include\imgui.h" />
+    <ClInclude Include="..\include\imgui_impl_glfw.h" />
+    <ClInclude Include="..\include\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\include\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\include\imgui_internal.h" />
+    <ClInclude Include="..\include\imstb_rectpack.h" />
+    <ClInclude Include="..\include\imstb_textedit.h" />
+    <ClInclude Include="..\include\imstb_truetype.h" />
   </ItemGroup>
 </Project>

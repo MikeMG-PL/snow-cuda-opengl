@@ -62,10 +62,13 @@
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <Include>./include;../include;%(Include)</Include>
-      <AdditionalOptions>--extended-lambda -dc %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>--extended-lambda -rdc=true %(AdditionalOptions)</AdditionalOptions>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <CodeGeneration>compute_80,sm_80</CodeGeneration>
     </CudaCompile>
+    <CudaLink>
+      <AdditionalOptions>--device-link %(AdditionalOptions)</AdditionalOptions>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -87,10 +90,13 @@
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <Include>./include;../include;%(Include)</Include>
-      <AdditionalOptions>--extended-lambda -dc %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>--extended-lambda -rdc=true %(AdditionalOptions)</AdditionalOptions>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <CodeGeneration>compute_80,sm_80</CodeGeneration>
     </CudaCompile>
+    <CudaLink>
+      <AdditionalOptions>--device-link %(AdditionalOptions)</AdditionalOptions>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="grid.cu" />

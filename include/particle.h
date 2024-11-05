@@ -27,7 +27,7 @@ public:
     __host__ __device__ Particle() {}
     __host__ __device__ Particle(const Eigen::Vector3f&, const Eigen::Vector3f&, float, float, float, float, float, float);
 
-    __host__ __device__ virtual ~Particle() {}
+    __host__ __device__ ~Particle() {}
 
     __host__ friend std::ostream& operator<<(std::ostream&, const Particle&);
 
