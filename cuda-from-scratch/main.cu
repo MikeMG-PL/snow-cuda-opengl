@@ -115,7 +115,7 @@ int main(int argc, const char* argv[]) {
     }
     */
 
-    std::cout << "number of particles: " << particles.size() << ", number of bytes in particles: " << particles.size() * sizeof(Particle) << std::endl;
+    // std::cout << "number of particles: " << particles.size() << ", number of bytes in particles: " << particles.size() * sizeof(Particle) << std::endl;
 
     MPMSolver mpm_solver(particles);
 
@@ -135,7 +135,7 @@ int main(int argc, const char* argv[]) {
 #endif
 
     // glfw window creation
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Sand-MPM", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "TSK Snow MPM", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -155,9 +155,6 @@ int main(int argc, const char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // glfw setting callback
@@ -195,7 +192,7 @@ int main(int argc, const char* argv[]) {
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             renderer.setSide();
 
-        std::cout << "step: " << step << std::endl;
+        //std::cout << "step: " << step << std::endl;
 
         if (vm["save"].as<bool>()) {
             char pnt_fname[128];
@@ -217,7 +214,6 @@ int main(int argc, const char* argv[]) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         if (!start_simulation)
         {
             static float critical_compression = 0.0f;
@@ -229,13 +225,13 @@ int main(int argc, const char* argv[]) {
 
             ImGui::Begin("Snow Simulation Parameters");
 
-            ImGui::Text("Adjust the snow material properties");  // Display some instruction text
+            ImGui::Text("Adjust the snow material properties");
 
-            ImGui::SliderFloat("Critical Compression", &critical_compression, 2.5e-3f, 1.9e-2f);  // Slider for critical compression
-            ImGui::SliderFloat("Critical Stretch", &critical_stretch, 5.0e-3f, 7.5e-3f);  // Slider for critical stretch
-            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 5.0f, 10.0f);  // Slider for hardening coefficient
-            ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);  // Slider for initial density
-            ImGui::SliderFloat("Initial Young's Modulus", &initial_youngs_modulus, 4.8e4f, 1.4e5f);  // Slider for Young's Modulus
+            ImGui::SliderFloat("Critical Compression", &critical_compression, 2.5e-3f, 1.9e-2f);
+            ImGui::SliderFloat("Critical Stretch", &critical_stretch, 5.0e-3f, 7.5e-3f);
+            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 5.0f, 10.0f);
+            ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);
+            ImGui::SliderFloat("Initial Young's Modulus", &initial_youngs_modulus, 4.8e4f, 1.4e5f);
             ImGui::Text("Poisson's Ratio = 0.2");
 
             if (ImGui::Button("Start Simulation!"))
