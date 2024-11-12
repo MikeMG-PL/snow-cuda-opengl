@@ -36,9 +36,9 @@ private:
         2, 3, 0
     };
 
-    glm::mat4 origin_camera_ = glm::lookAt(glm::vec3(-1.0f, 0.4f, 7.0f),  // camera position
-        glm::vec3(-1.0f, 0.4f, 0.0f),  // target position
-        glm::vec3(0.0f, 1.0f, 0.0f)   // up vector
+    glm::mat4 origin_camera_ = glm::lookAt(glm::vec3(-2.2f, 0.3f, 5.0f),  // camera position
+        glm::vec3(-2.2f, 0.3f, 0.0f),  // target position
+        glm::vec3(0.3f, 1.0f, 0.0f)   // up vector
     );
 
     glm::mat4 up_camera_ = glm::lookAt(glm::vec3(0.0f, 6.8f, 0.0f),  // camera position
@@ -75,10 +75,10 @@ private:
 
     glm::mat4 view_;
     glm::mat4 projection_;
-    float fov_ = 20.0f;
+    float fov_ = 15.0f;
 
     // snow point size;
-    GLfloat radius_ = 0.05f;
+    GLfloat radius_ = 0.075f;
 
     void renderWall();
     void renderFloor();
