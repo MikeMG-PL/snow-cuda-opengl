@@ -221,8 +221,8 @@ int main(int argc, const char* argv[]) {
         {
             static float critical_compression = 0.0f;
             static float critical_stretch = 0.0f;
-            static float hardening_coefficient = 5.0f;
-            static float initial_density = 300.0f;
+            static float hardening_coefficient = 0.1f;
+            //static float initial_density = 300.0f;
             static float initial_youngs_modulus = 4.8e4f;
             static float poisson_ratio = 0.2f;
 
@@ -232,13 +232,24 @@ int main(int argc, const char* argv[]) {
 
             ImGui::SliderFloat("Critical Compression", &critical_compression, 2.5e-3f, 1.9e-2f);
             ImGui::SliderFloat("Critical Stretch", &critical_stretch, 5.0e-3f, 7.5e-3f);
-            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 5.0f, 10.0f);
-            ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);
+            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 0.1f, 2.5f);
+            //ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);
             ImGui::SliderFloat("Initial Young's Modulus", &initial_youngs_modulus, 4.8e4f, 1.4e5f);
             ImGui::Text("Poisson's Ratio = 0.2");
 
             if (ImGui::Button("Start Simulation!"))
+            {
                 start_simulation = true;
+
+                for (int i = 0; i < particles.size(); i++)
+                {
+                    particles[i].hardening = hardening_coefficient;
+                    particles[i].lambda = (poisson_ratio * initial_youngs_modulus) / ((1.0f + poisson_ratio) * (1.0f - 2.0f * poisson_ratio));
+                    particles[i].mu = initial_youngs_modulus / (2.0f * (1.0f + poisson_ratio));
+                    particles[i].compression = critical_compression;
+                    particles[i].stretch = critical_stretch;
+                }
+            }
 
             ImGui::End();
         }
