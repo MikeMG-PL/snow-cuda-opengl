@@ -76,6 +76,7 @@ private:
     glm::mat4 view_;
     glm::mat4 projection_;
     float fov_ = 15.0f;
+    int frameNumber = 0;
 
     // snow point size;
     GLfloat radius_ = 0.075f;
@@ -83,6 +84,7 @@ private:
     void renderWall();
     void renderFloor();
     void renderSnow();
+    void saveFrame();
 };
 
 #endif
