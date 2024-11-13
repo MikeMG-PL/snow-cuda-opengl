@@ -5,6 +5,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "renderer.h"
+
+#include <stb_image_write.h>
+#include <vector>
+
 #include "shader.h"
 #include "texture.h"
 
@@ -81,6 +85,7 @@ void Renderer::render() {
     // renderWall();
     renderFloor();
     renderSnow();
+    saveFrame();
 }
 
 void Renderer::renderWall() {
@@ -117,6 +122,23 @@ void Renderer::renderSnow() {
     glm::mat4 model(1.0f);
     glUniformMatrix4fv(glGetUniformLocation(snow_shader_, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glDrawArrays(GL_POINTS, 0, GLsizei(number_));
+}
+
+void Renderer::saveFrame()
+{
+    std::vector<unsigned char> pixels(width_ * height_ * 3); // RGB format
+    glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+    std::string const filename = "../frames/frame_" + std::to_string(frameNumber) + ".png";
+
+    for (int y = 0; y < height_ / 2; ++y) {
+        int const oppositeY = height_ - y - 1;
+        for (int x = 0; x < width_ * 3; ++x) {
+            std::swap(pixels[y * width_ * 3 + x], pixels[oppositeY * width_ * 3 + x]);
+        }
+    }
+
+    stbi_write_png(filename.c_str(), width_, height_, 3, pixels.data(), width_ * 3);
+    frameNumber++;
 }
 
 GLuint Renderer::getSnowVBO() {

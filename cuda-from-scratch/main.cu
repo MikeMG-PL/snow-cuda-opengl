@@ -21,8 +21,36 @@
 
 #include "renderer.h"
 
-const unsigned int WIDTH = 800;
-const unsigned int HEIGHT = 600;
+const unsigned int WIDTH = 1920;
+const unsigned int HEIGHT = 1080;
+
+#include "imgui.h"
+#include <stdio.h>
+#define GL_SILENCE_DEPRECATION
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+#include <GLES2/gl2.h>
+#endif
+#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
+#pragma comment(lib, "legacy_stdio_definitions")
+#endif
+
+// This example can also compile and run with Emscripten! See 'Makefile.emscripten' for details.
+#ifdef __EMSCRIPTEN__
+#include "../libs/emscripten/emscripten_mainloop_stub.h"
+#endif
+
+static void glfw_error_callback(int error, const char* description)
+{
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
 
 void errorCallback(int error, const char* description) {
     std::cerr << "Errors: " << description << std::endl;
@@ -43,8 +71,6 @@ int main(int argc, const char* argv[]) {
 
     int margc = sizeof(margv) / sizeof(margv[0]); // Number of arguments
     auto vm = parser::parseArgs(margc, margv);
-
-
 
     std::vector<Particle> particles;
 
@@ -92,7 +118,7 @@ int main(int argc, const char* argv[]) {
     }
     */
 
-    std::cout << "number of particles: " << particles.size() << ", number of bytes in particles: " << particles.size() * sizeof(Particle) << std::endl;
+    // std::cout << "number of particles: " << particles.size() << ", number of bytes in particles: " << particles.size() * sizeof(Particle) << std::endl;
 
     MPMSolver mpm_solver(particles);
 
@@ -112,13 +138,27 @@ int main(int argc, const char* argv[]) {
 #endif
 
     // glfw window creation
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Sand-MPM", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "TSK Snow MPM", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return EXIT_FAILURE;
     }
     glfwMakeContextCurrent(window);
+
+    // Setup Dear ImGui context
+    const char* glsl_version = "#version 130";
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // glfw setting callback
     glfwSetErrorCallback(errorCallback);
@@ -143,6 +183,7 @@ int main(int argc, const char* argv[]) {
 
     // render loop
     int step = 0;
+    bool start_simulation = false;
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
@@ -154,7 +195,7 @@ int main(int argc, const char* argv[]) {
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             renderer.setSide();
 
-        std::cout << "step: " << step << std::endl;
+        //std::cout << "step: " << step << std::endl;
 
         if (vm["save"].as<bool>()) {
             char pnt_fname[128];
@@ -163,14 +204,79 @@ int main(int argc, const char* argv[]) {
         }
         step++;
 
-        mpm_solver.simulate();
-        mpm_solver.writeGLBuffer();
-        renderer.render();
-
-        // glfw: swap buffers and poll IO events
-        glfwSwapBuffers(window);
         glfwPollEvents();
+
+        if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
+        {
+            ImGui_ImplGlfw_Sleep(10);
+            continue;
+        }
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        if (!start_simulation)
+        {
+            static float critical_compression = 0.0f;
+            static float critical_stretch = 0.0f;
+            static float hardening_coefficient = 0.1f;
+            //static float initial_density = 300.0f;
+            static float initial_youngs_modulus = 4.8e4f;
+            static float poisson_ratio = 0.2f;
+
+            ImGui::Begin("Snow Simulation Parameters");
+
+            ImGui::Text("Adjust the snow material properties");
+
+            ImGui::SliderFloat("Critical Compression", &critical_compression, 2.5e-3f, 1.9e-2f);
+            ImGui::SliderFloat("Critical Stretch", &critical_stretch, 5.0e-3f, 7.5e-3f);
+            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 0.1f, 2.5f);
+            //ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);
+            ImGui::SliderFloat("Initial Young's Modulus", &initial_youngs_modulus, 4.8e4f, 1.4e5f);
+            ImGui::Text("Poisson's Ratio = 0.2");
+
+            if (ImGui::Button("Start Simulation!"))
+            {
+                start_simulation = true;
+
+                for (int i = 0; i < particles.size(); i++)
+                {
+                    particles[i].hardening = hardening_coefficient;
+                    particles[i].lambda = (poisson_ratio * initial_youngs_modulus) / ((1.0f + poisson_ratio) * (1.0f - 2.0f * poisson_ratio));
+                    particles[i].mu = initial_youngs_modulus / (2.0f * (1.0f + poisson_ratio));
+                    particles[i].compression = critical_compression;
+                    particles[i].stretch = critical_stretch;
+                }
+            }
+
+            ImGui::End();
+        }
+
+        // Rendering
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        if (start_simulation)
+        {
+            mpm_solver.simulate();
+            mpm_solver.writeGLBuffer();
+            renderer.render();
+        }
+
+        glfwSwapBuffers(window);
     }
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();

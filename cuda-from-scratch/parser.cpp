@@ -57,17 +57,17 @@ namespace parser {
         po::notify(vm);
 
         if (vm.count("help")) {
-            std::cout << desc << std::endl;
+            //std::cout << desc << std::endl;
             exit(0);
         }
 
         if (vm.count("save")) {
             std::string save = vm["save"].as<bool>() ? "On" : "Off";
-            std::cout << "Save frame: " << save << std::endl;
+            //std::cout << "Save frame: " << save << std::endl;
         }
 
         if (vm.count("config")) {
-            std::cout << "Configuration file: " << vm["config"].as<std::string>() << std::endl;
+            //std::cout << "Configuration file: " << vm["config"].as<std::string>() << std::endl;
 
             po::options_description config("Model Config");
 
@@ -78,7 +78,12 @@ namespace parser {
                 ("model,m", po::value<std::string>()->required(), "model file")
                 ;
 
-            std::ifstream fs(vm["config"].as<std::string>());
+            std::ifstream fs;
+            fs.open(vm["config"].as<std::string>(), std::ifstream::in);
+            if (!fs.is_open()) {
+                std::cerr << "Error: Could not open configuration file " << vm["config"].as<std::string>() << std::endl;
+                exit(1);
+            }
             po::store(po::parse_config_file(fs, config), vm);
             po::notify(vm);
 
@@ -91,7 +96,7 @@ namespace parser {
     std::vector<ModelConfig> parseModel(const std::string& filename) {
         pt::ptree model_tree;
 
-        std::cout << "Parsing " << filename << std::endl;
+        // std::cout << "Parsing " << filename << std::endl;
 
         pt::read_json(filename, model_tree);
 
@@ -105,7 +110,7 @@ namespace parser {
         std::vector<ModelConfig> vec;
 
         BOOST_FOREACH(const auto & model, model_tree) {
-            std::cout << "\tModel name: " << model.first << std::endl;
+            //std::cout << "\tModel name: " << model.first << std::endl;
             const auto& prop = model.second;
             auto path = prop.get<std::string>("path");
             auto translate = getVector3f(prop, "translate");
