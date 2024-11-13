@@ -128,7 +128,14 @@ void Renderer::saveFrame()
 {
     std::vector<unsigned char> pixels(width_ * height_ * 3); // RGB format
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
-    std::string const filename = "../frames/frame_" + std::to_string(frameNumber) + ".png";
+
+    std::string additional_zeros;
+    if (frameNumber < 10)
+        additional_zeros = "00";
+    else if (frameNumber < 100)
+        additional_zeros = "0";
+
+    std::string const filename = "../frames/frame" + additional_zeros + std::to_string(frameNumber) + ".png";
 
     for (int y = 0; y < height_ / 2; ++y) {
         int const oppositeY = height_ - y - 1;
