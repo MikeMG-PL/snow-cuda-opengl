@@ -236,7 +236,7 @@ __host__ void MPMSolver::updateVelocities() {
         grids.begin(),
         grids.end(),
         [=] __device__(Grid & g) {
-        g.updateVelocity();
+        g.update_velocity();
     }
     );
 }

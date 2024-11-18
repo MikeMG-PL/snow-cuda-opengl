@@ -1,8 +1,6 @@
 #include "constant.h"
 #include "grid.h"
 
-#include <crt/host_defines.h>
-
 __host__ __device__ void Grid::reset() {
     mass = 0.0f;
     force.setZero();
@@ -10,7 +8,7 @@ __host__ __device__ void Grid::reset() {
     velocity_star.setZero();
 }
 
-__host__ __device__ void Grid::updateVelocity() {
+__host__ __device__ void Grid::update_velocity() {
     if (mass > 0.0f) {
         Eigen::Vector3f const g = { gravity[0], gravity[1], gravity[2] };
         float const inv_mass = 1.0f / mass;

@@ -1,5 +1,4 @@
-#ifndef GRID_H_
-#define GRID_H_
+#pragma once
 
 #include <crt/host_defines.h>
 #include <Eigen/Dense>
@@ -17,8 +16,5 @@ public:
     __host__ __device__ virtual ~Grid() {}
 
     __host__ __device__ void reset();
-    __host__ __device__ void updateVelocity();
-    __host__ __device__ void applyBoundaryCollision();
+    __host__ __device__ void update_velocity();
 };
-
-#endif  // GRID_H_
