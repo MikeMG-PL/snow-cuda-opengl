@@ -19,9 +19,9 @@ __host__ __device__ Particle::Particle(const Eigen::Vector3f& _position, const E
 }
 
 __host__ std::ostream& operator<<(std::ostream& os, const Particle& p) {
-    unsigned short x = p.position(0) * 65535.0f / (GRID_BOUND_X * PARTICLE_DIAM),
-        y = p.position(1) * 65535.0f / (GRID_BOUND_Y * PARTICLE_DIAM),
-        z = p.position(2) * 65535.0f / (GRID_BOUND_Z * PARTICLE_DIAM);
+    unsigned short x = p.position(0) * 65535.0f / (grid_bound_x * particle_diameter),
+        y = p.position(1) * 65535.0f / (grid_bound_y * particle_diameter),
+        z = p.position(2) * 65535.0f / (grid_bound_z * particle_diameter);
 
     os.write(reinterpret_cast<char*>(&x), sizeof(unsigned short));
     os.write(reinterpret_cast<char*>(&y), sizeof(unsigned short));
@@ -31,15 +31,15 @@ __host__ std::ostream& operator<<(std::ostream& os, const Particle& p) {
 }
 
 __host__ __device__ void Particle::updatePosition() {
-    position += TIMESTEP * velocity;
+    position += step * velocity;
 }
 
 __host__ __device__ void Particle::updateVelocity(const Eigen::Vector3f& velocity_pic, const Eigen::Vector3f& velocity_flip) {
-    velocity = (1 - ALPHA) * velocity_pic + ALPHA * velocity_flip;
+    velocity = (1 - damping) * velocity_pic + damping * velocity_flip;
 }
 
 __host__ __device__ void Particle::updateDeformationGradient(const Eigen::Matrix3f& velocity_gradient) {
-    def_elastic = (Eigen::Matrix3f::Identity() + (TIMESTEP * velocity_gradient)) * def_elastic;
+    def_elastic = (Eigen::Matrix3f::Identity() + (step * velocity_gradient)) * def_elastic;
 
     Eigen::Matrix3f force_all(def_elastic * def_plastic);
 

@@ -4,8 +4,6 @@
 #include <crt/host_defines.h>
 #include <Eigen/Dense>
 
-#include "constant.h"
-
 class Grid {
 public:
     Eigen::Vector3i idx;

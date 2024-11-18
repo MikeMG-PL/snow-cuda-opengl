@@ -1,23 +1,16 @@
-#ifndef CONSTANT_H_
-#define CONSTANT_H_
+#pragma once
 
-#include <Eigen/Dense>
+__constant__ constexpr int G2P = 2;
+__constant__ constexpr int grid_bound_x = 130;
+__constant__ constexpr int grid_bound_y = 50;
+__constant__ constexpr int grid_bound_z = 100;
 
-#define TIMESTEP 1e-4f
-#define GRAVITY Eigen::Vector3f(-6.9f, -6.48f, 0.0f)
-#define PARTICLE_DIAM 0.005f
+__constant__ constexpr float step = 0.0001f;
+__constant__ constexpr float particle_diameter = 0.005f;
+__constant__ constexpr float damping = 0.95f;
+__constant__ constexpr float stickiness = 0.9f;
+__constant__ constexpr float friction = 1.0f;
+__constant__ constexpr float box_boundary_1 = 0.0f * particle_diameter;
+__constant__ constexpr float box_boundary_2 = grid_bound_x * particle_diameter;
 
-#define ALPHA 0.95f
-#define STICKY_WALL 0.9f
-#define FRICTION 1.0f
-
-#define GRID_BOUND_X 130
-#define GRID_BOUND_Y 50
-#define GRID_BOUND_Z 100
-
-#define BOX_BOUNDARY_1 (0.0 * PARTICLE_DIAM)
-#define BOX_BOUNDARY_2 (GRID_BOUND_X * PARTICLE_DIAM)
-
-#define G2P 2
-
-#endif  // CONSTANT_H_
+__constant__ static const float gravity[3] = { -6.9f, -6.48f, 0.0f };

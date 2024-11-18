@@ -79,7 +79,7 @@ int main(int argc, const char* argv[]) {
         auto model_vec = parser::parseModel(vm["model"].as<std::string>());
 
         for (const auto& config : model_vec) {
-            auto model = PointLoader(config.path, config.translate * PARTICLE_DIAM, config.scale);
+            auto model = PointLoader(config.path, config.translate * particle_diameter, config.scale);
             for (const auto& pos : model.positions) {
                 particles.push_back(
                     Particle(
@@ -100,14 +100,14 @@ int main(int argc, const char* argv[]) {
     /*
     {
         // two balls
-        // TIMESTEP 1e-4
+        // step 1e-4
         // HARDENING 10.0f
         // CRIT_COMPRESS 1.9e-2
         // CRIT_STRETCH 7.5e-3
-        // ALPHA 0.95f
+        // damping 0.95f
         // PATICLE_DIAM 0.010
-        // STICKY_WALL 0.9
-        // FRICTION 1.0
+        // stickiness 0.9
+        // friction 1.0
         // DENSITY 400
         // YOUNG 1.4e5
         // POSSION 0.2

@@ -12,9 +12,10 @@ __host__ __device__ void Grid::reset() {
 
 __host__ __device__ void Grid::updateVelocity() {
     if (mass > 0.0f) {
-        float inv_mass = 1.0f / mass;
-        force += (mass * GRAVITY);
+        Eigen::Vector3f const g = { gravity[0], gravity[1], gravity[2] };
+        float const inv_mass = 1.0f / mass;
+        force += (mass * g);
         velocity *= inv_mass;
-        velocity_star = velocity + TIMESTEP * inv_mass * force;
+        velocity_star = velocity + step * inv_mass * force;
     }
 }
