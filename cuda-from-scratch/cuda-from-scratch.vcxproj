@@ -136,7 +136,6 @@
     <ClInclude Include="..\include\imstb_textedit.h" />
     <ClInclude Include="..\include\imstb_truetype.h" />
     <ClInclude Include="..\include\linalg.h" />
-    <ClInclude Include="..\include\lyra\lyra.hpp" />
     <ClInclude Include="..\include\mpm_solver.h" />
     <ClInclude Include="..\include\parser.h" />
     <ClInclude Include="..\include\particle.h" />
