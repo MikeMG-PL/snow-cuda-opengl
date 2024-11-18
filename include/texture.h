@@ -1,10 +1,6 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
 #include <string>
-
 #include <glad/glad.h>
 
-GLuint loadTexture(const std::string& texture_path);
-
-#endif
+GLuint load_texture(const std::string& texture_path);
