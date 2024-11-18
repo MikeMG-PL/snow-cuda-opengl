@@ -10,6 +10,7 @@
 #include "mpm_solver.h"
 #include "point_loader.h"
 #include "parser.h"
+#include "camera.h"
 
 #include <glad/glad.h>
 
@@ -175,6 +176,10 @@ int main(int argc, const char* argv[]) {
     ret = cudaGetLastError();
     assert(ret == cudaSuccess);
 
+    Camera camera(glm::vec3(-0.7f, 0.3f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+
     Renderer renderer(WIDTH, HEIGHT, particles.size());
     ret = cudaGetLastError();
     assert(ret == cudaSuccess);
@@ -184,7 +189,14 @@ int main(int argc, const char* argv[]) {
     // render loop
     int step = 0;
     bool start_simulation = false;
+    bool pause_simulation = false;
+    bool pressed = false;
     while (!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        glfwPollEvents();
         processInput(window);
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
             renderer.setOrigin();
@@ -195,6 +207,51 @@ int main(int argc, const char* argv[]) {
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             renderer.setSide();
 
+        if (!pressed && glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            pause_simulation = !pause_simulation;
+            pressed = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE)
+        {
+            pressed = false;
+        }
+
+        // Process input
+        if (pause_simulation)
+        {
+            // Process input
+            bool forward = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+            bool backward = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+            bool left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+            bool right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+            bool rollLeft = glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS;
+            bool rollRight = glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS;
+
+            camera.process_keyboard(forward, backward, left, right, rollLeft, rollRight, deltaTime);
+
+            // Process mouse input
+            double xpos, ypos;
+            glfwGetCursorPos(window, &xpos, &ypos);
+            static bool firstMouse = true;
+            static float lastX = xpos, lastY = ypos;
+            if (firstMouse) {
+                lastX = xpos;
+                lastY = ypos;
+                firstMouse = false;
+            }
+            float xoffset = xpos - lastX;
+            float yoffset = lastY - ypos; // Reversed since y-coordinates go bottom to top
+            lastX = xpos;
+            lastY = ypos;
+
+            camera.process_mouse_movement(xoffset, yoffset);
+
+            // Update the renderer's view matrix
+            renderer.view_ = camera.get_view_matrix();
+        }
+
         //std::cout << "step: " << step << std::endl;
 
         if (vm["save"].as<bool>()) {
@@ -203,8 +260,6 @@ int main(int argc, const char* argv[]) {
             mpm_solver.writeToFile(pnt_fname);
         }
         step++;
-
-        glfwPollEvents();
 
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
         {
@@ -232,7 +287,7 @@ int main(int argc, const char* argv[]) {
 
             ImGui::SliderFloat("Critical Compression", &critical_compression, 2.5e-3f, 1.9e-2f);
             ImGui::SliderFloat("Critical Stretch", &critical_stretch, 5.0e-3f, 7.5e-3f);
-            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 0.1f, 2.5f);
+            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 0.1f, 15.0f);
             //ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);
             ImGui::SliderFloat("Initial Young's Modulus", &initial_youngs_modulus, 4.8e4f, 1.4e5f);
             ImGui::Text("Poisson's Ratio = 0.2");
@@ -265,9 +320,20 @@ int main(int argc, const char* argv[]) {
 
         if (start_simulation)
         {
-            mpm_solver.simulate();
-            mpm_solver.writeGLBuffer();
-            renderer.render();
+            if (!pause_simulation)
+            {
+                mpm_solver.simulate();
+                mpm_solver.writeGLBuffer();
+            }
+
+            if (pause_simulation)
+            {
+                renderer.render(false);
+            }
+            else
+            {
+                renderer.render(true);
+            }
         }
 
         glfwSwapBuffers(window);

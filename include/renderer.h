@@ -15,12 +15,14 @@ struct CUDABUffers {
 class Renderer {
 public:
     Renderer(int width, int height, int number);
-    void render();
+    void render(bool save_frame = true);
     GLuint getSnowVBO();
     void setOrigin();
     void setUp();
     void setFront();
     void setSide();
+
+    glm::mat4 view_;
 
 private:
     const GLfloat wall_vertices_[20] = {
@@ -36,8 +38,8 @@ private:
         2, 3, 0
     };
 
-    glm::mat4 origin_camera_ = glm::lookAt(glm::vec3(-2.2f, 0.3f, 5.0f),  // camera position
-        glm::vec3(-2.2f, 0.3f, 0.0f),  // target position
+    glm::mat4 origin_camera_ = glm::lookAt(glm::vec3(-0.7f, 0.3f, 5.0f),  // camera position
+        glm::vec3(-0.7f, 0.3f, 0.0f),  // target position
         glm::vec3(0.3f, 1.0f, 0.0f)   // up vector
     );
 
@@ -73,7 +75,6 @@ private:
     GLBuffers plane_buffers_;
     CUDABUffers snow_buffers_;
 
-    glm::mat4 view_;
     glm::mat4 projection_;
     float fov_ = 15.0f;
     int frameNumber = 0;

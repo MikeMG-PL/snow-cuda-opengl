@@ -78,14 +78,18 @@ Renderer::Renderer(int width, int height, int number)
     // ------------------------------------------------------------------------
 }
 
-void Renderer::render() {
+void Renderer::render(bool save_frame) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // renderWall();
     renderFloor();
     renderSnow();
-    saveFrame();
+
+    if (save_frame)
+    {
+        saveFrame();
+    }
 }
 
 void Renderer::renderWall() {
