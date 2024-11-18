@@ -31,7 +31,7 @@ Renderer::Renderer(int width, int height, int number)
 
     // plane
     // ------------------------------------------------------------------------
-    plane_shader_ = loadShader("./plane.vert", "./plane.frag");
+    plane_shader_ = load_shader("./plane.vert", "./plane.frag");
 
     glUseProgram(plane_shader_);
     glUniformMatrix4fv(glGetUniformLocation(plane_shader_, "projection"), 1, GL_FALSE, glm::value_ptr(projection_));
@@ -57,7 +57,7 @@ Renderer::Renderer(int width, int height, int number)
 
     // snow
     // ------------------------------------------------------------------------
-    snow_shader_ = loadShader("./snow.vert", "./snow.frag");
+    snow_shader_ = load_shader("./snow.vert", "./snow.frag");
 
     glUseProgram(snow_shader_);
     glUniformMatrix4fv(glGetUniformLocation(snow_shader_, "projection"), 1, GL_FALSE, glm::value_ptr(projection_));
