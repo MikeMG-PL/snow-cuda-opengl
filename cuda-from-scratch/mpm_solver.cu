@@ -52,11 +52,6 @@ __device__ Eigen::Vector3f gradientWeight(const Eigen::Vector3f& xpgp_diff) {
     return (1.0f / particle_diameter) * Eigen::Vector3f(dNX(v(0)) * NX(fabs(v(1))) * NX(fabs(v(2))),
         NX(fabs(v(0))) * dNX(v(1)) * NX(fabs(v(2))),
         NX(fabs(v(0))) * NX(fabs(v(1))) * dNX(v(2)));
-    /*
-    return Eigen::Vector3f(dNX(v(0)) * NX(fabs(v(1))) * NX(fabs(v(2))),
-                           NX(fabs(v(0))) * dNX(v(1)) * NX(fabs(v(2))),
-                           NX(fabs(v(0))) * NX(fabs(v(1))) * dNX(v(2)));
-    */
 }
 
 __device__ int getGridIndex(const Eigen::Vector3i& pos) {

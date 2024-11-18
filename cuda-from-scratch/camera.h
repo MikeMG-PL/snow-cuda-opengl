@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
+
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -88,5 +88,3 @@ private:
     float sensitivity_;
     float roll_speed_; // Speed of roll rotation
 };
-
-#endif
