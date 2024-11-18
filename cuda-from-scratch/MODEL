@@ -1,14 +1,14 @@
 {
-  "model1": {
+  "model2": {
     "path": "PATH",
-    "translate": [50.0, -0.5, 50.0],
+    "translate": [120.0, 5.0, 50.0],
     "scale": 0.5,
     "mass": 0.000026,
-    "velocity": [-10.0, -2.0, 0.0],
-    "hardening": 1.0,
+    "velocity": [-5.0, -1.0, 0.0],
+    "hardening": 5.0,
     "young": 1.4e5,
     "poisson": 0.2,
-    "compression": 5.0e-2,
-    "stretch": 5.0e-2
+    "compression": 2.5e-2,
+    "stretch": 5.0e-3
   }
 }

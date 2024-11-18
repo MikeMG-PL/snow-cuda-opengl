@@ -18,14 +18,6 @@
 #define BOX_BOUNDARY_1 (0.0 * PARTICLE_DIAM)
 #define BOX_BOUNDARY_2 (GRID_BOUND_X * PARTICLE_DIAM)
 
-#define ENABLE_IMPLICIT false
-
-#if ENABLE_IMPLICIT
-#define SOLVE_MAX_ITERATIONS 10
-#define RESIDUAL_THRESHOLD
-#define BETA 0.5
-#endif
-
 #define G2P 2
 
 #endif  // CONSTANT_H_

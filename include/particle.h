@@ -20,10 +20,6 @@ public:
 
     Eigen::Matrix3f def_elastic, def_plastic;
 
-#if ENABLE_IMPLICIT
-    Eigen::Matrix3f polar_r, polar_s;
-#endif
-
     __host__ __device__ Particle() {}
     __host__ __device__ Particle(const Eigen::Vector3f&, const Eigen::Vector3f&, float, float, float, float, float, float);
 
@@ -36,9 +32,6 @@ public:
     __host__ __device__ void updateDeformationGradient(const Eigen::Matrix3f&);
     __host__ __device__ void applyBoundaryCollision();
     __host__ __device__ const Eigen::Matrix3f energyDerivative() const;
-#if ENABLE_IMPLICIT
-    __host__ __device__ const Eigen::Matrix3f computeDeltaForce(const Eigen::Matrix3f&) const;
-#endif
 
 private:
     __host__ __device__ const thrust::pair<float, float> computeHardening() const;

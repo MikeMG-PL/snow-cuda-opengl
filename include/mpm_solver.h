@@ -12,7 +12,7 @@
 #include "particle.h"
 
 class MPMSolver {
-  public:
+public:
     __host__ MPMSolver(const std::vector<Particle>&);
     __host__ MPMSolver(const std::vector<Particle>&, const std::vector<Grid>&);
     __host__ ~MPMSolver() {}
@@ -23,10 +23,6 @@ class MPMSolver {
     __host__ void computeVolumes();
     __host__ void updateVelocities();
     __host__ void bodyCollisions();
-#if ENABLE_IMPLICIT
-    __host__ void computeAr();
-    __host__ void integrateImplicit();
-#endif
     __host__ void updateDeformationGradient();
     __host__ void updateParticleVelocities();
     __host__ void particleBodyCollisions();
@@ -37,10 +33,10 @@ class MPMSolver {
     __host__ void writeGLBuffer();
     __host__ void writeToFile(const std::string&);
 
-  private:
+private:
     thrust::device_vector<Particle> particles;
     thrust::device_vector<Grid> grids;
-    struct cudaGraphicsResource *vbo_resource;
+    struct cudaGraphicsResource* vbo_resource;
     bool initial_transfer = true;
 };
 
