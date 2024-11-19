@@ -1,8 +1,6 @@
 #include <iostream>
 #include <cstdio>
 #include <vector>
-#include <Eigen/Dense>
-#include <thrust/device_new.h>
 
 #include "grid.h"
 #include "constant.h"
@@ -13,17 +11,15 @@
 #include "camera.h"
 
 #include <glad/glad.h>
-
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "renderer.h"
 
-const unsigned int WIDTH = 1920;
-const unsigned int HEIGHT = 1080;
+constexpr unsigned int width = 1920;
+constexpr unsigned int height = 1080;
 
 #include "imgui.h"
 #include <stdio.h>
@@ -97,30 +93,6 @@ int main(int argc, const char* argv[]) {
         }
     }
 
-    /*
-    {
-        // two balls
-        // step 1e-4
-        // HARDENING 10.0f
-        // CRIT_COMPRESS 1.9e-2
-        // CRIT_STRETCH 7.5e-3
-        // damping 0.95f
-        // PATICLE_DIAM 0.010
-        // stickiness 0.9
-        // friction 1.0
-        // DENSITY 400
-        // YOUNG 1.4e5
-        // POSSION 0.2
-        const int height = 70;
-        Eigen::Vector3i center(70, height, 80);
-        createSphere(particles, center, 20, Eigen::Vector3f(0.0f, 0.0f, -3.0f), mass, lambda, mu, 4);
-        center(2) = 30;
-        createSphere(particles, center, 7, Eigen::Vector3f(0.0f, 0.0f, 15.0f), mass, lambda, mu, 50);
-    }
-    */
-
-    // std::cout << "number of particles: " << particles.size() << ", number of bytes in particles: " << particles.size() * sizeof(Particle) << std::endl;
-
     MPMSolver mpm_solver(particles);
 
     auto ret = cudaGetLastError();
@@ -139,7 +111,7 @@ int main(int argc, const char* argv[]) {
 #endif
 
     // glfw window creation
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "TSK Snow MPM", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(width, height, "TSK Snow MPM", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -180,7 +152,7 @@ int main(int argc, const char* argv[]) {
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
-    Renderer renderer(WIDTH, HEIGHT, particles.size());
+    Renderer renderer(width, height, particles.size());
     ret = cudaGetLastError();
     assert(ret == cudaSuccess);
 

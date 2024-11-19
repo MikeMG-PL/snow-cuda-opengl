@@ -120,8 +120,6 @@
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="point_loader.cpp" />
     <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\constant.h" />
@@ -141,9 +139,7 @@
     <ClInclude Include="..\include\particle.h" />
     <ClInclude Include="..\include\point_loader.h" />
     <ClInclude Include="..\include\renderer.h" />
-    <ClInclude Include="..\include\shader.h" />
     <ClInclude Include="..\include\stb_image.h" />
-    <ClInclude Include="..\include\texture.h" />
     <ClInclude Include="camera.h" />
   </ItemGroup>
   <ItemGroup>

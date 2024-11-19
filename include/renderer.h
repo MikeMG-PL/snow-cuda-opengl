@@ -1,5 +1,6 @@
 #ifndef RENDER_H
 #define RENDER_H
+#include <string>
 
 struct GLBuffers {
     GLuint vao;
@@ -21,6 +22,8 @@ public:
     void setUp();
     void setFront();
     void setSide();
+    GLuint load_texture(const std::string& texture_path);
+    GLuint load_shader(const std::string& vertex_path, const std::string& fragment_path);
 
     glm::mat4 view_;
 
