@@ -9,7 +9,8 @@
 
 #include "constant.h"
 
-class Particle {
+class Particle
+{
 public:
     float volume, mass;
     Eigen::Vector3f position, velocity;
@@ -23,18 +24,18 @@ public:
     __host__ __device__ Particle() {}
     __host__ __device__ Particle(const Eigen::Vector3f&, const Eigen::Vector3f&, float, float, float, float, float, float);
 
-    __host__ __device__ ~Particle() {}
+    __host__ __device__ ~Particle() = default;
 
     __host__ friend std::ostream& operator<<(std::ostream&, const Particle&);
 
-    __host__ __device__ void updatePosition();
-    __host__ __device__ void updateVelocity(const Eigen::Vector3f&, const Eigen::Vector3f&);
-    __host__ __device__ void updateDeformationGradient(const Eigen::Matrix3f&);
-    __host__ __device__ void applyBoundaryCollision();
-    __host__ __device__ const Eigen::Matrix3f energyDerivative() const;
+    __host__ __device__ void update_position();
+    __host__ __device__ void update_velocity(const Eigen::Vector3f&, const Eigen::Vector3f&);
+    __host__ __device__ void update_deformation_gradient(const Eigen::Matrix3f&);
+    __host__ __device__ void apply_boundary_collision();
+    __host__ __device__ const Eigen::Matrix3f energy_derivative() const;
 
 private:
-    __host__ __device__ const thrust::pair<float, float> computeHardening() const;
+    __host__ __device__ const thrust::pair<float, float> compute_hardening() const;
 };
 
 #endif  // PARTICLE_H_

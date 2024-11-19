@@ -2,33 +2,36 @@
 #define RENDER_H
 #include <string>
 
-struct GLBuffers {
+struct GLBuffers
+{
     GLuint vao;
     GLuint vbo;
     GLuint ebo;
 };
 
-struct CUDABUffers {
+struct CUDABUffers
+{
     GLuint vao;
     GLuint vbo;
 };
 
-class Renderer {
+class Renderer
+{
 public:
     Renderer(int width, int height, int number);
-    void render(bool save_frame = true);
-    GLuint getSnowVBO();
-    void setOrigin();
-    void setUp();
-    void setFront();
-    void setSide();
+    void render(bool const save_frame = true);
+    GLuint get_snow_vbo();
+    void set_origin();
+    void set_up();
+    void set_front();
+    void set_side();
     GLuint load_texture(const std::string& texture_path);
     GLuint load_shader(const std::string& vertex_path, const std::string& fragment_path);
 
     glm::mat4 view_;
 
 private:
-    const GLfloat wall_vertices_[20] = {
+    GLfloat const wall_vertices_[20] = {
         // positions        // texture coords
          1.5f,  1.5f, 0.0f, 1.0f, 1.0f,  //
         -1.5f,  1.5f, 0.0f, 0.0f, 1.0f,  //
@@ -36,7 +39,7 @@ private:
          1.5f, -1.5f, 0.0f, 1.0f, 0.0f,  //
     };
 
-    const GLuint indices_[6] = {
+    GLuint const indices_[6] = {
         0, 1, 2, //
         2, 3, 0
     };
@@ -85,10 +88,10 @@ private:
     // snow point size;
     GLfloat radius_ = 0.075f;
 
-    void renderWall();
-    void renderFloor();
-    void renderSnow();
-    void saveFrame();
+    void render_wall();
+    void render_floor();
+    void render_snow();
+    void save_frame_to_file();
 };
 
 #endif

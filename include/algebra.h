@@ -1,5 +1,6 @@
 #pragma once
 
+#include <crt/host_defines.h>
 #include <Eigen/Dense>
 #include <svd3/svd3_cuda/svd3_cuda.h>
 

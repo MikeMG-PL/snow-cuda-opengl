@@ -11,17 +11,22 @@
 
 #include "parser.h"
 
-namespace boost {
-    void validate(boost::any& v, const std::vector<std::string>& values, std::vector<float>*, int) {
+namespace boost
+{
+    void validate(boost::any& v, const std::vector<std::string>& values, std::vector<float>*, int)
+    {
         std::vector<float> vec;
-        for (const auto& val : values) {
+        for (auto const& val : values)
+        {
             std::stringstream ss(val);
             std::copy(std::istream_iterator<float>(ss), std::istream_iterator<float>(), std::back_inserter(vec));
         }
+
         v = vec;
     }
 
-    void validate(boost::any& v, const std::vector<std::string>& values, Eigen::Vector3f*, int) {
+    void validate(boost::any& v, const std::vector<std::string>& values, Eigen::Vector3f*, int)
+    {
         Eigen::Vector3f c;
         std::vector<float> fvalues;
         for (const auto& val : values) {
@@ -39,11 +44,13 @@ namespace boost {
     }
 } // boost
 
-namespace parser {
+namespace parser
+{
     namespace po = boost::program_options;
     namespace pt = boost::property_tree;
 
-    po::variables_map parseArgs(const int argc, const char* argv[]) {
+    po::variables_map parse_args(const int argc, const char* argv[])
+    {
         po::options_description desc("Material Point Method Simulation");
 
         desc.add_options()
@@ -56,17 +63,20 @@ namespace parser {
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
 
-        if (vm.count("help")) {
+        if (vm.count("help"))
+        {
             //std::cout << desc << std::endl;
             exit(0);
         }
 
-        if (vm.count("save")) {
+        if (vm.count("save"))
+        {
             std::string save = vm["save"].as<bool>() ? "On" : "Off";
             //std::cout << "Save frame: " << save << std::endl;
         }
 
-        if (vm.count("config")) {
+        if (vm.count("config"))
+        {
             //std::cout << "Configuration file: " << vm["config"].as<std::string>() << std::endl;
 
             po::options_description config("Model Config");
@@ -80,7 +90,8 @@ namespace parser {
 
             std::ifstream fs;
             fs.open(vm["config"].as<std::string>(), std::ifstream::in);
-            if (!fs.is_open()) {
+            if (!fs.is_open())
+            {
                 std::cerr << "Error: Could not open configuration file " << vm["config"].as<std::string>() << std::endl;
                 exit(1);
             }
@@ -93,7 +104,8 @@ namespace parser {
         return vm;
     }
 
-    std::vector<ModelConfig> parseModel(const std::string& filename) {
+    std::vector<ModelConfig> parseModel(const std::string& filename)
+    {
         pt::ptree model_tree;
 
         // std::cout << "Parsing " << filename << std::endl;

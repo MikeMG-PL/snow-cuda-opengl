@@ -1,5 +1,7 @@
 #pragma once
 
+#include <crt/host_defines.h>
+
 __constant__ constexpr int G2P = 2;
 __constant__ constexpr int grid_bound_x = 130;
 __constant__ constexpr int grid_bound_y = 50;

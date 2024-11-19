@@ -8,10 +8,11 @@
 
 #include <Eigen/Dense>
 
-class PointLoader {
+class PointLoader
+{
 public:
     std::vector<Eigen::Vector3f> positions;
-    PointLoader(const std::string& fname) : PointLoader(fname, Eigen::Vector3f(0.0f, 0.0f, 0.0f), 1.0f) {}
+    explicit PointLoader(const std::string& fname) : PointLoader(fname, Eigen::Vector3f(0.0f, 0.0f, 0.0f), 1.0f) {}
     PointLoader(const std::string&, const Eigen::Vector3f&, const float);
 };
 

@@ -19,7 +19,8 @@
 Renderer::Renderer(int width, int height, int number)
     : width_(width),
     height_(height),
-    number_(number) {
+    number_(number)
+{
     aspect_ratio_ = static_cast<float>(width_) / height_;
 
     view_ = origin_camera_;
@@ -82,21 +83,23 @@ Renderer::Renderer(int width, int height, int number)
     // ------------------------------------------------------------------------
 }
 
-void Renderer::render(bool save_frame) {
+void Renderer::render(bool const save_frame)
+{
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // renderWall();
-    renderFloor();
-    renderSnow();
+    render_floor();
+    render_snow();
 
     if (save_frame)
     {
-        saveFrame();
+        save_frame_to_file();
     }
 }
 
-void Renderer::renderWall() {
+void Renderer::render_wall()
+{
     glUseProgram(plane_shader_);
     glUniform1i(glGetUniformLocation(plane_shader_, "texture1"), 1);
     glBindVertexArray(plane_buffers_.vao);
@@ -109,7 +112,8 @@ void Renderer::renderWall() {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer::renderFloor() {
+void Renderer::render_floor()
+{
     glUseProgram(plane_shader_);
     glUniform1i(glGetUniformLocation(plane_shader_, "texture1"), 0);
     glBindVertexArray(plane_buffers_.vao);
@@ -122,7 +126,7 @@ void Renderer::renderFloor() {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer::renderSnow() {
+void Renderer::render_snow() {
     glUseProgram(snow_shader_);
     glBindVertexArray(snow_buffers_.vao);
 
@@ -132,7 +136,7 @@ void Renderer::renderSnow() {
     glDrawArrays(GL_POINTS, 0, GLsizei(number_));
 }
 
-void Renderer::saveFrame()
+void Renderer::save_frame_to_file()
 {
     std::vector<unsigned char> pixels(width_ * height_ * 3); // RGB format
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
@@ -273,22 +277,22 @@ GLuint Renderer::load_shader(const std::string& vertex_path,
     return shader_program;
 }
 
-GLuint Renderer::getSnowVBO() {
+GLuint Renderer::get_snow_vbo() {
     return snow_buffers_.vbo;
 }
 
-void Renderer::setOrigin() {
+void Renderer::set_origin() {
     view_ = origin_camera_;
 }
 
-void Renderer::setUp() {
+void Renderer::set_up() {
     view_ = up_camera_;
 }
 
-void Renderer::setFront() {
+void Renderer::set_front() {
     view_ = front_camera_;
 }
 
-void Renderer::setSide() {
+void Renderer::set_side() {
     view_ = side_camera_;
 }

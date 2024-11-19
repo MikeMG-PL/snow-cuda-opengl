@@ -18,79 +18,99 @@
                       0 <= POS(1) && POS(1) < grid_bound_y && \
                       0 <= POS(2) && POS(2) < grid_bound_z)
 
-__device__ float NX(const float& x) {
-    if (x < 1.0f) {
+__device__ float NX(const float& x)
+{
+    if (x < 1.0f)
+    {
         return 0.5f * (x * x * x) - (x * x) + (2.0f / 3.0f);
     }
-    else if (x < 2.0f) {
+    else if (x < 2.0f)
+    {
         return (-1.0f / 6.0f) * (x * x * x) + (x * x) - (2.0f * x) + (4.0f / 3.0f);
     }
-    else {
+    else
+    {
         return 0.0f;
     }
 }
 
-__device__ float dNX(const float& x) {
+__device__ float dNX(const float& x)
+{
     float abs_x = fabs(x);
-    if (abs_x < 1.0f) {
+
+    if (abs_x < 1.0f)
+    {
         return (1.5f * abs_x * x) - (2.0f * x);
     }
-    else if (abs_x < 2.0f) {
+    else if (abs_x < 2.0f)
+    {
         return -0.5f * (abs_x * x) + (2.0f * x) - (2.0f * x / abs_x);
     }
-    else {
+    else
+    {
         return 0.0f;
     }
 }
 
-__device__ float weight(const Eigen::Vector3f& xpgp_diff) {
+__device__ float weight(const Eigen::Vector3f& xpgp_diff)
+{
     return NX(xpgp_diff(0)) * NX(xpgp_diff(1)) * NX(xpgp_diff(2));
 }
 
-__device__ Eigen::Vector3f gradientWeight(const Eigen::Vector3f& xpgp_diff) {
-    const auto& v = xpgp_diff;
+__device__ Eigen::Vector3f gradientWeight(const Eigen::Vector3f& xpgp_diff)
+{
+    auto const& v = xpgp_diff;
+
     return (1.0f / particle_diameter) * Eigen::Vector3f(dNX(v(0)) * NX(fabs(v(1))) * NX(fabs(v(2))),
         NX(fabs(v(0))) * dNX(v(1)) * NX(fabs(v(2))),
         NX(fabs(v(0))) * NX(fabs(v(1))) * dNX(v(2)));
 }
 
-__device__ int getGridIndex(const Eigen::Vector3i& pos) {
+__device__ int getGridIndex(const Eigen::Vector3i& pos)
+{
     return (pos(2) * grid_bound_y * grid_bound_x) + (pos(1) * grid_bound_x) + pos(0);
 }
 
-__device__ Eigen::Vector3f applyBoundaryCollision(const Eigen::Vector3f& position, const Eigen::Vector3f& velocity) {
+__device__ Eigen::Vector3f applyBoundaryCollision(const Eigen::Vector3f& position, const Eigen::Vector3f& velocity)
+{
     float vn;
     Eigen::Vector3f vt, normal, ret(velocity);
 
-    bool collision;
-
-    for (int i = 0; i < 3; i++) {
-        collision = false;
+    for (int i = 0; i < 3; i++)
+    {
+        bool collision = false;
         normal.setZero();
 
-        if (position(i) <= box_boundary_1) {
+        if (position(i) <= box_boundary_1)
+        {
             collision = true;
             normal(i) = 1.0f;
         }
-        else if (position(i) >= box_boundary_2) {
+        else if (position(i) >= box_boundary_2)
+        {
             collision = true;
             normal(i) = -1.0f;
         }
 
-        if (collision) {
+        if (collision)
+        {
             vn = ret.dot(normal);
 
-            if (vn >= 0.0f) continue;
+            if (vn >= 0.0f)
+                continue;
 
-            for (int j = 0; j < 3; j++) {
-                if (j != i) {
+            for (int j = 0; j < 3; j++)
+            {
+                if (j != i)
+                {
                     ret(j) *= stickiness;
                 }
             }
 
             vt = ret - vn * normal;
 
-            if (vt.norm() <= -friction * vn) {
+            if (vt.norm() <= -friction * vn)
+            {
                 ret.setZero();
                 return ret;
             }
@@ -102,14 +122,16 @@ __device__ Eigen::Vector3f applyBoundaryCollision(const Eigen::Vector3f& positio
     return ret;
 }
 
-struct f {
-    __host__ __device__
-        Grid operator()(const int& idx) {
+struct f
+{
+    __host__ __device__ Grid operator()(const int& idx) const
+    {
         return Grid(Eigen::Vector3i(idx % grid_bound_x, idx % (grid_bound_x * grid_bound_y) / grid_bound_x, idx / (grid_bound_x * grid_bound_y)));
     }
 };
 
-__host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles) {
+__host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles)
+{
     particles.resize(_particles.size());
     thrust::copy(_particles.begin(), _particles.end(), particles.begin());
 
@@ -122,7 +144,8 @@ __host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles) {
     );
 }
 
-__host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles, const std::vector<Grid>& _grids) {
+__host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles, const std::vector<Grid>& _grids)
+{
     particles.resize(_particles.size());
     grids.resize(_grids.size());
 
@@ -130,7 +153,8 @@ __host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles, const std
     thrust::copy(_grids.begin(), _grids.end(), grids.begin());
 }
 
-__host__ void MPMSolver::initialTransfer() {
+__host__ void MPMSolver::perform_initial_transfer()
+{
     Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
     auto ff = [=] __device__(Particle & p) {
@@ -155,24 +179,27 @@ __host__ void MPMSolver::initialTransfer() {
     thrust::for_each(thrust::device, particles.begin(), particles.end(), ff);
 }
 
-__host__ void MPMSolver::resetGrid() {
+__host__ void MPMSolver::reset_grid()
+{
     thrust::for_each(
         thrust::device,
         grids.begin(),
         grids.end(),
-        [=] __device__(Grid & g) {
+        [=] __device__(Grid & g)
+    {
         g.reset();
     }
     );
 }
 
-__host__ void MPMSolver::transferData() {
+__host__ void MPMSolver::transfer_data()
+{
     Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
     auto ff = [=] __device__(Particle & p) {
-        float h_inv = 1.0f / particle_diameter;
-        Eigen::Vector3i pos((p.position * h_inv).cast<int>());
-        Eigen::Matrix3f volume_stress = -1.0f * p.energyDerivative();
+        float constexpr h_inv = 1.0f / particle_diameter;
+        Eigen::Vector3i const pos((p.position * h_inv).cast<int>());
+        Eigen::Matrix3f const volume_stress = -1.0f * p.energy_derivative();
 
         for (int z = -G2P; z <= G2P; z++) {
             for (int y = -G2P; y <= G2P; y++) {
@@ -202,8 +229,9 @@ __host__ void MPMSolver::transferData() {
     thrust::for_each(thrust::device, particles.begin(), particles.end(), ff);
 }
 
-__host__ void MPMSolver::computeVolumes() {
-    Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
+__host__ void MPMSolver::compute_volumes()
+{
+    Grid* const grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
     auto ff = [=] __device__(Particle & p) {
         float h_inv = 1.0f / particle_diameter;
@@ -230,7 +258,8 @@ __host__ void MPMSolver::computeVolumes() {
     thrust::for_each(thrust::device, particles.begin(), particles.end(), ff);
 }
 
-__host__ void MPMSolver::updateVelocities() {
+__host__ void MPMSolver::update_velocities()
+{
     thrust::for_each(
         thrust::device,
         grids.begin(),
@@ -241,7 +270,8 @@ __host__ void MPMSolver::updateVelocities() {
     );
 }
 
-__host__ void MPMSolver::bodyCollisions() {
+__host__ void MPMSolver::body_collisions()
+{
     thrust::for_each(
         thrust::device,
         grids.begin(),
@@ -252,10 +282,11 @@ __host__ void MPMSolver::bodyCollisions() {
     );
 }
 
-__host__ void MPMSolver::updateDeformationGradient() {
-    Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
+__host__ void MPMSolver::update_deformation_gradient()
+{
+    Grid const* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
-    auto computeVelocityGradient = [=] __device__(const Particle & p) -> Eigen::Matrix3f {
+    auto compute_velocity_gradient = [=] __device__(const Particle & p) -> Eigen::Matrix3f {
         float h_inv = 1.0f / particle_diameter;
         Eigen::Vector3i pos((p.position * h_inv).cast<int>());
         Eigen::Matrix3f velocity_gradient(Eigen::Matrix3f::Zero());
@@ -283,18 +314,19 @@ __host__ void MPMSolver::updateDeformationGradient() {
         particles.begin(),
         particles.end(),
         [=] __device__(Particle & p) {
-        auto velocity_gradient = computeVelocityGradient(p);
-        p.updateDeformationGradient(velocity_gradient);
+        auto const velocity_gradient = compute_velocity_gradient(p);
+        p.update_deformation_gradient(velocity_gradient);
     }
     );
 }
 
-__host__ void MPMSolver::updateParticleVelocities() {
-    Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
+__host__ void MPMSolver::update_particle_velocities()
+{
+    Grid const* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
-    auto computeVelocity = [=] __device__(const Particle & p) -> thrust::pair<Eigen::Vector3f, Eigen::Vector3f> {
-        float h_inv = 1.0f / particle_diameter;
-        Eigen::Vector3i pos((p.position * h_inv).cast<int>());
+    auto compute_velocity = [=] __device__(const Particle & p) -> thrust::pair<Eigen::Vector3f, Eigen::Vector3f> {
+        float constexpr h_inv = 1.0f / particle_diameter;
+        Eigen::Vector3i const pos((p.position * h_inv).cast<int>());
 
         Eigen::Vector3f velocity_pic(Eigen::Vector3f::Zero()),
             velocity_flip(p.velocity);
@@ -306,7 +338,7 @@ __host__ void MPMSolver::updateParticleVelocities() {
                     if (!IN_GRID(_pos)) continue;
 
                     Eigen::Vector3f diff = (p.position - (_pos.cast<float>() * particle_diameter)) * h_inv;
-                    int grid_idx = getGridIndex(_pos);
+                    int const grid_idx = getGridIndex(_pos);
                     float w = weight(diff.cwiseAbs());
                     auto grid = grid_ptr[grid_idx];
                     velocity_pic += grid.velocity_star * w;
@@ -323,13 +355,14 @@ __host__ void MPMSolver::updateParticleVelocities() {
         particles.begin(),
         particles.end(),
         [=] __device__(Particle & p) {
-        auto velocity_result = computeVelocity(p);
-        p.updateVelocity(velocity_result.first, velocity_result.second);
+        auto const velocity_result = compute_velocity(p);
+        p.update_velocity(velocity_result.first, velocity_result.second);
     }
     );
 }
 
-__host__ void MPMSolver::particleBodyCollisions() {
+__host__ void MPMSolver::particle_body_collisions()
+{
     thrust::for_each(
         thrust::device,
         particles.begin(),
@@ -340,42 +373,46 @@ __host__ void MPMSolver::particleBodyCollisions() {
     );
 }
 
-__host__ void MPMSolver::updateParticlePositions() {
+__host__ void MPMSolver::update_particle_positions()
+{
     thrust::for_each(
         thrust::device,
         particles.begin(),
         particles.end(),
         [=] __device__(Particle & p) {
-        p.updatePosition();
+        p.update_position();
     }
     );
 }
 
-__host__ void MPMSolver::simulate() {
-    resetGrid();
+__host__ void MPMSolver::simulate()
+{
+    reset_grid();
     if (initial_transfer) {
-        initialTransfer();
-        computeVolumes();
+        perform_initial_transfer();
+        compute_volumes();
         initial_transfer = false;
     }
     else {
-        transferData();
+        transfer_data();
     }
-    updateVelocities();
-    bodyCollisions();
-    updateDeformationGradient();
-    updateParticleVelocities();
-    particleBodyCollisions();
-    updateParticlePositions();
+    update_velocities();
+    body_collisions();
+    update_deformation_gradient();
+    update_particle_velocities();
+    particle_body_collisions();
+    update_particle_positions();
 }
 
-__host__ void MPMSolver::bindGLBuffer(const GLuint buffer) {
+__host__ void MPMSolver::bind_gl_buffer(const GLuint buffer)
+{
     cudaError_t ret;
     ret = cudaGraphicsGLRegisterBuffer(&vbo_resource, buffer, cudaGraphicsMapFlagsWriteDiscard);
     assert(ret == cudaSuccess);
 }
 
-__host__ void MPMSolver::writeGLBuffer() {
+__host__ void MPMSolver::write_gl_buffer()
+{
     cudaError_t ret;
     float4* bufptr;
     size_t size;
@@ -400,7 +437,8 @@ __host__ void MPMSolver::writeGLBuffer() {
     assert(ret == cudaSuccess);
 }
 
-__host__ void MPMSolver::writeToFile(const std::string& filename) {
+__host__ void MPMSolver::write_to_file(const std::string& filename)
+{
     std::ofstream output(filename, std::ios::binary | std::ios::out);
     int num_particles = particles.size();
     float min_bound_x = 0, max_bound_x = grid_bound_x;

@@ -39,55 +39,50 @@ constexpr unsigned int height = 1080;
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-// This example can also compile and run with Emscripten! See 'Makefile.emscripten' for details.
-#ifdef __EMSCRIPTEN__
-#include "../libs/emscripten/emscripten_mainloop_stub.h"
-#endif
-
-static void glfw_error_callback(int error, const char* description)
+void error_callback(int error, const char* description)
 {
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
-
-void errorCallback(int error, const char* description) {
     std::cerr << "Errors: " << description << std::endl;
 }
 
-void processInput(GLFWwindow* window) {
+void process_input(GLFWwindow* window)
+{
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
 
-int main(int argc, const char* argv[]) {
-
-    const char* margv[] = {
+int main(int argc, char const* argv[])
+{
+    char const* margv[] = {
             "cuda-from-scratch.exe",
             "--config",
             "config"
     };
 
     int margc = sizeof(margv) / sizeof(margv[0]); // Number of arguments
-    auto vm = parser::parseArgs(margc, margv);
+    auto vm = parser::parse_args(margc, margv);
 
     std::vector<Particle> particles;
 
-    if (vm.count("model")) {
+    if (vm.count("model"))
+    {
         auto model_vec = parser::parseModel(vm["model"].as<std::string>());
 
-        for (const auto& config : model_vec) {
+        for (auto const& config : model_vec)
+        {
             auto model = PointLoader(config.path, config.translate * particle_diameter, config.scale);
-            for (const auto& pos : model.positions) {
-                particles.push_back(
-                    Particle(
-                        pos,
-                        config.velocity,
-                        config.mass,
-                        config.hardening,
-                        config.young,
-                        config.poisson,
-                        config.compression,
-                        config.stretch
-                    )
+
+            for (auto const& pos : model.positions)
+            {
+                particles.emplace_back(
+                    pos,
+                    config.velocity,
+                    config.mass,
+                    config.hardening,
+                    config.young,
+                    config.poisson,
+                    config.compression,
+                    config.stretch
+
                 );
             }
         }
@@ -102,7 +97,9 @@ int main(int argc, const char* argv[]) {
     assert(ret == cudaSuccess);
 
     // glfw: initialize and configure
-    if (!glfwInit()) return EXIT_FAILURE;
+    if (!glfwInit())
+        return EXIT_FAILURE;
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -112,15 +109,17 @@ int main(int argc, const char* argv[]) {
 
     // glfw window creation
     GLFWwindow* window = glfwCreateWindow(width, height, "TSK Snow MPM", nullptr, nullptr);
-    if (!window) {
+    if (!window)
+    {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return EXIT_FAILURE;
     }
+
     glfwMakeContextCurrent(window);
 
     // Setup Dear ImGui context
-    const char* glsl_version = "#version 130";
+    char const* glsl_version = "#version 130";
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -134,50 +133,53 @@ int main(int argc, const char* argv[]) {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // glfw setting callback
-    glfwSetErrorCallback(errorCallback);
+    glfwSetErrorCallback(error_callback);
 
     // glad: load all OpenGL function pointers
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cerr << "Failed to initialize GLAD" << '\n';
         return EXIT_FAILURE;
     }
 
-    std::cerr << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+    std::cerr << "OpenGL version: " << glGetString(GL_VERSION) << '\n';
     glEnable(GL_DEPTH_TEST);
 
     ret = cudaGetLastError();
     assert(ret == cudaSuccess);
 
     Camera camera(glm::vec3(-0.7f, 0.3f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
+    float delta_time = 0.0f;
+    float last_frame = 0.0f;
 
     Renderer renderer(width, height, particles.size());
     ret = cudaGetLastError();
     assert(ret == cudaSuccess);
 
-    mpm_solver.bindGLBuffer(renderer.getSnowVBO());
+    mpm_solver.bind_gl_buffer(renderer.get_snow_vbo());
 
     // render loop
     int step = 0;
     bool start_simulation = false;
     bool pause_simulation = false;
     bool pressed = false;
-    while (!glfwWindowShouldClose(window)) {
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+    while (!glfwWindowShouldClose(window))
+    {
+        float current_frame = glfwGetTime();
+        delta_time = current_frame - last_frame;
+        last_frame = current_frame;
 
         glfwPollEvents();
-        processInput(window);
+        process_input(window);
+
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-            renderer.setOrigin();
+            renderer.set_origin();
         if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-            renderer.setUp();
+            renderer.set_up();
         if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-            renderer.setFront();
+            renderer.set_front();
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            renderer.setSide();
+            renderer.set_side();
 
         if (!pressed && glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
         {
@@ -198,25 +200,28 @@ int main(int argc, const char* argv[]) {
             bool backward = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
             bool left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
             bool right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-            bool rollLeft = glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS;
-            bool rollRight = glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS;
+            bool roll_left = glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS;
+            bool roll_right = glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS;
 
-            camera.process_keyboard(forward, backward, left, right, rollLeft, rollRight, deltaTime);
+            camera.process_keyboard(forward, backward, left, right, roll_left, roll_right, delta_time);
 
             // Process mouse input
             double xpos, ypos;
             glfwGetCursorPos(window, &xpos, &ypos);
-            static bool firstMouse = true;
-            static float lastX = xpos, lastY = ypos;
-            if (firstMouse) {
-                lastX = xpos;
-                lastY = ypos;
-                firstMouse = false;
+            static bool first_mouse = true;
+            static float last_x = xpos, last_y = ypos;
+
+            if (first_mouse)
+            {
+                last_x = xpos;
+                last_y = ypos;
+                first_mouse = false;
             }
-            float xoffset = xpos - lastX;
-            float yoffset = lastY - ypos; // Reversed since y-coordinates go bottom to top
-            lastX = xpos;
-            lastY = ypos;
+
+            float xoffset = xpos - last_x;
+            float yoffset = last_y - ypos; // Reversed since y-coordinates go bottom to top
+            last_x = xpos;
+            last_y = ypos;
 
             camera.process_mouse_movement(xoffset, yoffset);
 
@@ -226,11 +231,13 @@ int main(int argc, const char* argv[]) {
 
         //std::cout << "step: " << step << std::endl;
 
-        if (vm["save"].as<bool>()) {
+        if (vm["save"].as<bool>())
+        {
             char pnt_fname[128];
             sprintf(pnt_fname, "points_%05d.dat", step);
-            mpm_solver.writeToFile(pnt_fname);
+            mpm_solver.write_to_file(pnt_fname);
         }
+
         step++;
 
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
@@ -295,7 +302,7 @@ int main(int argc, const char* argv[]) {
             if (!pause_simulation)
             {
                 mpm_solver.simulate();
-                mpm_solver.writeGLBuffer();
+                mpm_solver.write_gl_buffer();
             }
 
             if (pause_simulation)

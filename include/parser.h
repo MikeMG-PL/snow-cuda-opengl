@@ -5,9 +5,10 @@
 
 #include <Eigen/Dense>
 
-namespace parser {
-
-    struct ModelConfig {
+namespace parser
+{
+    struct ModelConfig
+    {
         std::string path;
         Eigen::Vector3f translate, velocity;
         float scale, mass, hardening, young, poisson, compression, stretch;
@@ -20,10 +21,11 @@ namespace parser {
             mass(_mass), velocity(_velocity),
             hardening(_hardening), young(_young), poisson(_poisson),
             compression(_compression), stretch(_stretch)
-        {}
+        {
+        }
     };
 
-    boost::program_options::variables_map parseArgs(const int argc, const char* []);
+    boost::program_options::variables_map parse_args(const int argc, const char* []);
     std::vector<ModelConfig> parseModel(const std::string&);
 } // parser
 
