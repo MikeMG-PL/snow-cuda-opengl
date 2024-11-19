@@ -159,7 +159,7 @@ int main(int argc, char const* argv[])
     mpm_solver.bind_gl_buffer(renderer.get_snow_vbo());
 
     // render loop
-    int step = 0;
+    int simulation_step = 0;
     bool start_simulation = false;
     bool pause_simulation = false;
     bool pressed = false;
@@ -220,16 +220,7 @@ int main(int argc, char const* argv[])
             renderer.view_ = camera.get_view_matrix();
         }
 
-        //std::cout << "step: " << step << std::endl;
-
-        if (vm["save"].as<bool>())
-        {
-            char pnt_fname[128];
-            sprintf(pnt_fname, "points_%05d.dat", step);
-            mpm_solver.write_to_file(pnt_fname);
-        }
-
-        step++;
+        simulation_step++;
 
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
         {
