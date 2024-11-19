@@ -3,7 +3,7 @@
 #include <crt/host_defines.h>
 
 #include "constant.h"
-#include "linalg.h"
+#include "algebra.h"
 
 __host__ __device__ Particle::Particle(const Eigen::Vector3f& _position, const Eigen::Vector3f& _velocity, float _mass,
     float _hardening, float young, float poisson, float _compression, float _stretch)
@@ -45,7 +45,7 @@ __host__ __device__ void Particle::updateDeformationGradient(const Eigen::Matrix
 
     Eigen::Matrix3f u, s, v;
 
-    linalg::svd3(def_elastic, u, s, v);
+    algebra::svd_3x3(def_elastic, u, s, v);
 
     // clip values
     auto e = s.diagonal().array();
@@ -60,18 +60,18 @@ __host__ __device__ void Particle::updateDeformationGradient(const Eigen::Matrix
 }
 
 __host__ __device__ const thrust::pair<float, float> Particle::computeHardening() const {
-    float factor = expf(hardening * (1 - linalg::determinant(def_plastic)));
+    float factor = expf(hardening * (1 - algebra::det(def_plastic)));
     return thrust::make_pair(mu * factor, lambda * factor);
 }
 
 __host__ __device__ const Eigen::Matrix3f Particle::energyDerivative() const {
     Eigen::Matrix3f u, s, v;
 
-    linalg::svd3(def_elastic, u, s, v);
+    algebra::svd_3x3(def_elastic, u, s, v);
 
     float _mu, _lambda;
     thrust::tie(_mu, _lambda) = computeHardening();
-    float je = linalg::determinant(def_elastic);
+    float je = algebra::det(def_elastic);
 
     Eigen::Matrix3f tmp(2.0f * _mu * (def_elastic - u * v.transpose()) * def_elastic.transpose());
 
