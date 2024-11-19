@@ -88,7 +88,6 @@ void Renderer::render(bool const save_frame)
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // renderWall();
     render_floor();
     render_snow();
 
@@ -279,20 +278,4 @@ GLuint Renderer::load_shader(const std::string& vertex_path,
 
 GLuint Renderer::get_snow_vbo() {
     return snow_buffers_.vbo;
-}
-
-void Renderer::set_origin() {
-    view_ = origin_camera_;
-}
-
-void Renderer::set_up() {
-    view_ = up_camera_;
-}
-
-void Renderer::set_front() {
-    view_ = front_camera_;
-}
-
-void Renderer::set_side() {
-    view_ = side_camera_;
 }

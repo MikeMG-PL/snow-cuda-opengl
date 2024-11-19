@@ -172,15 +172,6 @@ int main(int argc, char const* argv[])
         glfwPollEvents();
         process_input(window);
 
-        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-            renderer.set_origin();
-        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-            renderer.set_up();
-        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-            renderer.set_front();
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            renderer.set_side();
-
         if (!pressed && glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
         {
             pause_simulation = !pause_simulation;

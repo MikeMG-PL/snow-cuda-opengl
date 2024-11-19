@@ -21,10 +21,6 @@ public:
     Renderer(int width, int height, int number);
     void render(bool const save_frame = true);
     GLuint get_snow_vbo();
-    void set_origin();
-    void set_up();
-    void set_front();
-    void set_side();
     GLuint load_texture(const std::string& texture_path);
     GLuint load_shader(const std::string& vertex_path, const std::string& fragment_path);
 
