@@ -26,14 +26,6 @@ Renderer::Renderer(int width, int height, int number)
     view_ = origin_camera_;
     projection_ = glm::perspective(glm::radians(fov_), static_cast<float>(width_) / height_, 0.1f, 100.0f);
 
-    // bind textures on corresponding texture units
-    texture1_ = load_texture("../images/container.jpg");
-    texture2_ = load_texture("../images/container.jpg");
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1_);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2_);
-
     // plane
     // ------------------------------------------------------------------------
     plane_shader_ = load_shader("./plane.vert", "./plane.frag");
@@ -160,43 +152,6 @@ void Renderer::save_frame_to_file()
 
     stbi_write_png(filename.c_str(), width_, height_, 3, pixels.data(), width_ * 3);
     frameNumber++;
-}
-
-GLuint Renderer::load_texture(const std::string& texture_path)
-{
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // load and generate the texture
-    stbi_set_flip_vertically_on_load(true);
-    int width, height, channel;
-    unsigned char* data =
-        stbi_load(texture_path.c_str(), &width, &height, &channel, 0);
-    if (data)
-    {
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        if (channel == 3)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                GL_UNSIGNED_BYTE, data);
-        else if (channel == 4)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-                GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cerr << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    return texture;
 }
 
 void check_errors(GLuint id, const std::string& type)
