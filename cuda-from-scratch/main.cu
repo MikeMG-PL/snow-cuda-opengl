@@ -88,7 +88,7 @@ int main(int argc, char const* argv[])
         }
     }
 
-    MPMSolver mpm_solver(particles);
+    MPMSolver mpm_solver;
 
     auto ret = cudaGetLastError();
     assert(ret == cudaSuccess);
@@ -103,9 +103,6 @@ int main(int argc, char const* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
     // glfw window creation
     GLFWwindow* window = glfwCreateWindow(width, height, "TSK Snow MPM", nullptr, nullptr);
@@ -235,21 +232,19 @@ int main(int argc, char const* argv[])
 
         if (!start_simulation)
         {
-            static float critical_compression = 0.0f;
-            static float critical_stretch = 0.0f;
-            static float hardening_coefficient = 0.1f;
-            //static float initial_density = 300.0f;
-            static float initial_youngs_modulus = 4.8e4f;
+            static float critical_compression = 2.5e-2f;
+            static float critical_stretch = 7.5e-3f;
+            static float hardening_coefficient = 10.0f;
+            static float initial_youngs_modulus = 1.4e5f;
             static float poisson_ratio = 0.2f;
 
             ImGui::Begin("Snow Simulation Parameters");
 
             ImGui::Text("Adjust the snow material properties");
 
-            ImGui::SliderFloat("Critical Compression", &critical_compression, 2.5e-3f, 1.9e-2f);
+            ImGui::SliderFloat("Critical Compression", &critical_compression, 1.9e-2f, 2.5e-2f);
             ImGui::SliderFloat("Critical Stretch", &critical_stretch, 5.0e-3f, 7.5e-3f);
-            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 0.1f, 15.0f);
-            //ImGui::SliderFloat("Initial Density", &initial_density, 300.0f, 500.0f);
+            ImGui::SliderFloat("Hardening Coefficient", &hardening_coefficient, 5.0f, 10.0f);
             ImGui::SliderFloat("Initial Young's Modulus", &initial_youngs_modulus, 4.8e4f, 1.4e5f);
             ImGui::Text("Poisson's Ratio = 0.2");
 
@@ -265,6 +260,8 @@ int main(int argc, char const* argv[])
                     particles[i].compression = critical_compression;
                     particles[i].stretch = critical_stretch;
                 }
+
+                mpm_solver.initialize(particles);
             }
 
             ImGui::End();

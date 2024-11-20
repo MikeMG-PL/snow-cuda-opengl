@@ -130,18 +130,9 @@ struct f
     }
 };
 
-__host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles)
+MPMSolver::MPMSolver(const std::vector<Particle>& _particles)
 {
-    particles.resize(_particles.size());
-    thrust::copy(_particles.begin(), _particles.end(), particles.begin());
-
-    grids.resize(grid_bound_x * grid_bound_y * grid_bound_z);
-    thrust::tabulate(
-        thrust::device,
-        grids.begin(),
-        grids.end(),
-        f()
-    );
+    initialize(_particles);
 }
 
 __host__ MPMSolver::MPMSolver(const std::vector<Particle>& _particles, const std::vector<Grid>& _grids)
@@ -179,7 +170,21 @@ __host__ void MPMSolver::perform_initial_transfer()
     thrust::for_each(thrust::device, particles.begin(), particles.end(), ff);
 }
 
-__host__ void MPMSolver::reset_grid()
+__host__ void MPMSolver::initialize(std::vector<Particle> const& _particles)
+{
+    particles.resize(_particles.size());
+    thrust::copy(_particles.begin(), _particles.end(), particles.begin());
+
+    grids.resize(grid_bound_x * grid_bound_y * grid_bound_z);
+    thrust::tabulate(
+        thrust::device,
+        grids.begin(),
+        grids.end(),
+        f()
+    );
+}
+
+void MPMSolver::reset_grid()
 {
     thrust::for_each(
         thrust::device,

@@ -14,9 +14,13 @@
 class MPMSolver
 {
 public:
+    __host__ MPMSolver() = default;
     __host__ explicit MPMSolver(const std::vector<Particle>&);
     __host__ MPMSolver(const std::vector<Particle>&, const std::vector<Grid>&);
     __host__ ~MPMSolver() {}
+
+    // Call this directly if not constructed with a constructor that already does this.
+    __host__ void initialize(std::vector<Particle> const& _particles);
 
     __host__ void reset_grid();
     __host__ void perform_initial_transfer();
