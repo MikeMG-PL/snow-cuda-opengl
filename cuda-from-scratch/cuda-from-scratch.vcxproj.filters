@@ -3,16 +3,14 @@
   <ItemGroup>
     <CudaCompile Include="grid.cu" />
     <CudaCompile Include="main.cu" />
-    <CudaCompile Include="mpm_solver.cu" />
+    <CudaCompile Include="mpm.cu" />
     <CudaCompile Include="particle.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.cpp" />
     <ClCompile Include="parser.cpp" />
-    <ClCompile Include="point_loader.cpp" />
+    <ClCompile Include="point_cloud.cpp" />
     <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="texture.cpp" />
     <ClCompile Include="..\include\imgui.cpp" />
     <ClCompile Include="..\include\imgui_demo.cpp" />
     <ClCompile Include="..\include\imgui_draw.cpp" />
@@ -28,18 +26,14 @@
     <None Include="snow.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\constant.h" />
+    <ClInclude Include="..\include\constants.h" />
     <ClInclude Include="..\include\grid.h" />
-    <ClInclude Include="..\include\linalg.h" />
-    <ClInclude Include="..\include\mpm_solver.h" />
+    <ClInclude Include="..\include\mpm.h" />
     <ClInclude Include="..\include\parser.h" />
     <ClInclude Include="..\include\particle.h" />
-    <ClInclude Include="..\include\point_loader.h" />
+    <ClInclude Include="..\include\point_cloud.h" />
     <ClInclude Include="..\include\renderer.h" />
-    <ClInclude Include="..\include\shader.h" />
     <ClInclude Include="..\include\stb_image.h" />
-    <ClInclude Include="..\include\texture.h" />
-    <ClInclude Include="..\include\lyra\lyra.hpp" />
     <ClInclude Include="..\include\imconfig.h" />
     <ClInclude Include="..\include\imgui.h" />
     <ClInclude Include="..\include\imgui_impl_glfw.h" />
@@ -50,5 +44,6 @@
     <ClInclude Include="..\include\imstb_textedit.h" />
     <ClInclude Include="..\include\imstb_truetype.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="..\include\algebra.h" />
   </ItemGroup>
 </Project>

@@ -1,18 +1,11 @@
 #include <cassert>
-
 #include <fstream>
-
-#include <Eigen/Dense>
-
 #include <thrust/for_each.h>
-#include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 #include <thrust/tabulate.h>
-
-#include <cuda.h>
 #include <cuda_runtime.h>
 
-#include "mpm_solver.h"
+#include "mpm.h"
 
 #define IN_GRID(POS) (0 <= POS(0) && POS(0) < grid_bound_x && \
                       0 <= POS(1) && POS(1) < grid_bound_y && \
@@ -21,17 +14,12 @@
 __device__ float NX(const float& x)
 {
     if (x < 1.0f)
-    {
         return 0.5f * (x * x * x) - (x * x) + (2.0f / 3.0f);
-    }
-    else if (x < 2.0f)
-    {
+
+    if (x < 2.0f)
         return (-1.0f / 6.0f) * (x * x * x) + (x * x) - (2.0f * x) + (4.0f / 3.0f);
-    }
-    else
-    {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 __device__ float dNX(const float& x)
@@ -148,13 +136,17 @@ __host__ void MPMSolver::perform_initial_transfer()
 {
     Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
-    auto ff = [=] __device__(Particle & p) {
+    auto ff = [=] __device__(Particle & p)
+    {
         float h_inv = 1.0f / particle_diameter;
         Eigen::Vector3i pos((p.position * h_inv).cast<int>());
 
-        for (int z = -G2P; z <= G2P; z++) {
-            for (int y = -G2P; y <= G2P; y++) {
-                for (int x = -G2P; x <= G2P; x++) {
+        for (int z = -G2P; z <= G2P; z++)
+        {
+            for (int y = -G2P; y <= G2P; y++)
+            {
+                for (int x = -G2P; x <= G2P; x++)
+                {
                     auto _pos = pos + Eigen::Vector3i(x, y, z);
                     if (!IN_GRID(_pos)) continue;
 
@@ -201,14 +193,18 @@ __host__ void MPMSolver::transfer_data()
 {
     Grid* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
-    auto ff = [=] __device__(Particle & p) {
+    auto ff = [=] __device__(Particle & p)
+    {
         float constexpr h_inv = 1.0f / particle_diameter;
         Eigen::Vector3i const pos((p.position * h_inv).cast<int>());
         Eigen::Matrix3f const volume_stress = -1.0f * p.energy_derivative();
 
-        for (int z = -G2P; z <= G2P; z++) {
-            for (int y = -G2P; y <= G2P; y++) {
-                for (int x = -G2P; x <= G2P; x++) {
+        for (int z = -G2P; z <= G2P; z++)
+        {
+            for (int y = -G2P; y <= G2P; y++)
+            {
+                for (int x = -G2P; x <= G2P; x++)
+                {
                     auto _pos = pos + Eigen::Vector3i(x, y, z);
                     if (!IN_GRID(_pos)) continue;
 
@@ -244,9 +240,12 @@ __host__ void MPMSolver::compute_volumes()
         float p_density = 0.0f;
         float inv_grid_volume = h_inv * h_inv * h_inv;
 
-        for (int z = -G2P; z <= G2P; z++) {
-            for (int y = -G2P; y <= G2P; y++) {
-                for (int x = -G2P; x <= G2P; x++) {
+        for (int z = -G2P; z <= G2P; z++)
+        {
+            for (int y = -G2P; y <= G2P; y++)
+            {
+                for (int x = -G2P; x <= G2P; x++)
+                {
                     auto _pos = pos + Eigen::Vector3i(x, y, z);
                     if (!IN_GRID(_pos)) continue;
 
@@ -291,14 +290,18 @@ __host__ void MPMSolver::update_deformation_gradient()
 {
     Grid const* grid_ptr = thrust::raw_pointer_cast(&grids[0]);
 
-    auto compute_velocity_gradient = [=] __device__(const Particle & p) -> Eigen::Matrix3f {
+    auto compute_velocity_gradient = [=] __device__(const Particle & p) -> Eigen::Matrix3f
+    {
         float h_inv = 1.0f / particle_diameter;
         Eigen::Vector3i pos((p.position * h_inv).cast<int>());
         Eigen::Matrix3f velocity_gradient(Eigen::Matrix3f::Zero());
 
-        for (int z = -G2P; z <= G2P; z++) {
-            for (int y = -G2P; y <= G2P; y++) {
-                for (int x = -G2P; x <= G2P; x++) {
+        for (int z = -G2P; z <= G2P; z++)
+        {
+            for (int y = -G2P; y <= G2P; y++)
+            {
+                for (int x = -G2P; x <= G2P; x++)
+                {
                     auto _pos = pos + Eigen::Vector3i(x, y, z);
                     if (!IN_GRID(_pos)) continue;
 
@@ -393,12 +396,14 @@ __host__ void MPMSolver::update_particle_positions()
 __host__ void MPMSolver::simulate()
 {
     reset_grid();
-    if (initial_transfer) {
+    if (transfer_first_time)
+    {
         perform_initial_transfer();
         compute_volumes();
-        initial_transfer = false;
+        transfer_first_time = false;
     }
-    else {
+    else
+    {
         transfer_data();
     }
     update_velocities();

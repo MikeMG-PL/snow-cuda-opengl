@@ -7,7 +7,7 @@
 #include <thrust/pair.h>
 #include <thrust/tuple.h>
 
-#include "constant.h"
+#include "constants.h"
 
 class Particle
 {

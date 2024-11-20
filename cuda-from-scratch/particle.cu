@@ -2,7 +2,7 @@
 
 #include <crt/host_defines.h>
 
-#include "constant.h"
+#include "constants.h"
 #include "algebra.h"
 
 __host__ __device__ Particle::Particle(const Eigen::Vector3f& _position, const Eigen::Vector3f& _velocity, float _mass,

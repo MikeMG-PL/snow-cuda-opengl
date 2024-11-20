@@ -27,7 +27,8 @@ public:
     glm::mat4 view_;
 
 private:
-    GLfloat const wall_vertices_[20] = {
+    GLfloat const wall_vertices_[20] =
+    {
         // positions        // texture coords
          1.5f,  1.5f, 0.0f, 1.0f, 1.0f,  //
         -1.5f,  1.5f, 0.0f, 0.0f, 1.0f,  //
@@ -35,7 +36,8 @@ private:
          1.5f, -1.5f, 0.0f, 1.0f, 0.0f,  //
     };
 
-    GLuint const indices_[6] = {
+    GLuint const indices_[6] =
+    {
         0, 1, 2, //
         2, 3, 0
     };
@@ -43,21 +45,6 @@ private:
     glm::mat4 origin_camera_ = glm::lookAt(glm::vec3(-0.7f, 0.3f, 5.0f),  // camera position
         glm::vec3(-0.7f, 0.3f, 0.0f),  // target position
         glm::vec3(0.3f, 1.0f, 0.0f)   // up vector
-    );
-
-    glm::mat4 up_camera_ = glm::lookAt(glm::vec3(0.0f, 6.8f, 0.0f),  // camera position
-        glm::vec3(0.0f, 1.2f, 0.0f),  // target position
-        glm::vec3(0.0f, 0.0f, -1.0f)   // up vector
-    );
-
-    glm::mat4 front_camera_ = glm::lookAt(glm::vec3(0.0f, 1.2f, 7.0f),  // camera position
-        glm::vec3(0.0f, 1.2f, 0.0f),  // target position
-        glm::vec3(0.0f, 1.0f, 0.0f)   // up vector
-    );
-
-    glm::mat4 side_camera_ = glm::lookAt(glm::vec3(7.0f, 1.2f, 0.0f),  // camera position
-        glm::vec3(0.0f, 1.2f, 0.0f),  // target position
-        glm::vec3(0.0f, 1.0f, 0.0f)   // up vector
     );
 
     // window size

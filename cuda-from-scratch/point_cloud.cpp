@@ -1,6 +1,8 @@
-#include "point_loader.h"
+#include "point_cloud.h"
+#include <fstream>
+#include <sstream>
 
-PointLoader::PointLoader(const std::string& fname,
+PointCloud::PointCloud(const std::string& fname,
     const Eigen::Vector3f& translate,
     const float scale)
 {

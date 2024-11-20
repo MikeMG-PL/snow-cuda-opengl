@@ -1,4 +1,4 @@
-#include "constant.h"
+#include "constants.h"
 #include "grid.h"
 
 __host__ __device__ void Grid::reset()

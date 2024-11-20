@@ -8,7 +8,7 @@
 #include <cuda_gl_interop.h>
 
 #include "grid.h"
-#include "constant.h"
+#include "constants.h"
 #include "particle.h"
 
 class MPMSolver
@@ -42,7 +42,7 @@ private:
     thrust::device_vector<Particle> particles;
     thrust::device_vector<Grid> grids;
     struct cudaGraphicsResource* vbo_resource;
-    bool initial_transfer = true;
+    bool transfer_first_time = true;
 };
 
 #endif  // MPM_SOLVER_H_

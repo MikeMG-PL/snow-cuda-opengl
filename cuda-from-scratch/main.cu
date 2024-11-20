@@ -2,11 +2,10 @@
 #include <cstdio>
 #include <vector>
 
-#include "grid.h"
-#include "constant.h"
+#include "constants.h"
 #include "particle.h"
-#include "mpm_solver.h"
-#include "point_loader.h"
+#include "mpm.h"
+#include "point_cloud.h"
 #include "parser.h"
 #include "camera.h"
 
@@ -69,7 +68,7 @@ int main(int argc, char const* argv[])
 
         for (auto const& config : model_vec)
         {
-            auto model = PointLoader(config.path, config.translate * particle_diameter, config.scale);
+            auto model = PointCloud(config.path, config.translate * particle_diameter, config.scale);
 
             for (auto const& pos : model.positions)
             {
